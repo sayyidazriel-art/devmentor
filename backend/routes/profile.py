@@ -15,6 +15,11 @@ class UserCreate(BaseModel):
     email: EmailStr
 
 
+class UserUpdate(BaseModel):
+    username: str = Field(min_length=3, max_length=50)
+    email: EmailStr
+
+
 @router.post("/")
 def create_profile(user_data: UserCreate):
     try:
@@ -24,9 +29,9 @@ def create_profile(user_data: UserCreate):
                     """
                     INSERT INTO users (username, email)
                     VALUES (%s, %s)
-                    RETURNING id, username, email, level, rank, xp;
+                    RETURNING id, username, email, level, rank, xp, created_at;
                     """,
-                    (user_data.username, user_data.email),
+                    (user_data.username, str(user_data.email)),
                 )
 
                 user = cursor.fetchone()
@@ -40,6 +45,7 @@ def create_profile(user_data: UserCreate):
                 "level": user[3],
                 "rank": user[4],
                 "xp": user[5],
+                "created_at": user[6],
             },
         }
 
@@ -63,7 +69,7 @@ def get_profile(user_id: int):
             with connection.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT id, username, email, level, rank, xp
+                    SELECT id, username, email, level, rank, xp, created_at
                     FROM users
                     WHERE id = %s;
                     """,
@@ -85,6 +91,7 @@ def get_profile(user_id: int):
             "level": user[3],
             "rank": user[4],
             "xp": user[5],
+            "created_at": user[6],
         }
 
     except HTTPException:
@@ -95,14 +102,70 @@ def get_profile(user_id: int):
             status_code=500,
             detail="Terjadi kesalahan saat mengambil profil pengguna.",
         )
-        
+
+
+@router.put("/{user_id}")
+def update_profile(user_id: int, user_data: UserUpdate):
+    try:
+        with get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    UPDATE users
+                    SET username = %s,
+                        email = %s
+                    WHERE id = %s
+                    RETURNING id, username, email, level, rank, xp, created_at;
+                    """,
+                    (
+                        user_data.username,
+                        str(user_data.email),
+                        user_id,
+                    ),
+                )
+
+                user = cursor.fetchone()
+
+        if user is None:
+            raise HTTPException(
+                status_code=404,
+                detail="User tidak ditemukan.",
+            )
+
+        return {
+            "message": "Profil berhasil diperbarui.",
+            "user": {
+                "id": user[0],
+                "username": user[1],
+                "email": user[2],
+                "level": user[3],
+                "rank": user[4],
+                "xp": user[5],
+                "created_at": user[6],
+            },
+        }
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        if getattr(error, "sqlstate", None) == "23505":
+            raise HTTPException(
+                status_code=409,
+                detail="Username atau email sudah digunakan pengguna lain.",
+            )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Gagal memperbarui profil pengguna.",
+        )
+
+
 @router.get("/{user_id}/progress")
 def get_user_progress(user_id: int):
     try:
         with get_connection() as connection:
             with connection.cursor() as cursor:
-
-                # Ambil data pengguna.
                 cursor.execute(
                     """
                     SELECT id, username, level, rank, xp
@@ -120,7 +183,6 @@ def get_user_progress(user_id: int):
                         detail="User tidak ditemukan.",
                     )
 
-                # Hitung statistik quest pengguna.
                 cursor.execute(
                     """
                     SELECT
@@ -138,7 +200,6 @@ def get_user_progress(user_id: int):
 
                 quest_stats = cursor.fetchone()
 
-        # Hitung informasi progres berdasarkan XP.
         progression = calculate_progression(user[4])
 
         return {

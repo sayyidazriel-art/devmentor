@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from backend.routes.profile import router as profile_router
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routes import ai_review
+from backend.routes.skills import router as skills_router
 
 app = FastAPI(
     title="DevMentor API",
@@ -39,5 +40,6 @@ def health_check():
 
 
 app.include_router(profile_router)
+app.include_router(skills_router)
 app.include_router(quests_router)
 app.include_router(ai_review.router)

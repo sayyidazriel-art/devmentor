@@ -123,6 +123,17 @@ async function apiGetProfile(userId) {
   return apiFetch(`/api/v1/profile/${userId}`);
 }
 
+async function apiGetSkills(userId) {
+    return apiFetch(`/api/v1/skills/${userId}`);
+}
+
+async function apiUpdateProfile(userId, username, email) {
+  return apiFetch(`/api/v1/profile/${userId}`, {
+    method: "PUT",
+    body: JSON.stringify({ username, email }),
+  });
+}
+
 /** GET /api/v1/profile/{user_id}/progress */
 async function apiGetProgress(userId) {
   return apiFetch(`/api/v1/profile/${userId}/progress`);
@@ -241,6 +252,70 @@ function renderProfileCard(user, progression) {
   setTextSafe("xpCurrentLevel",  `${levelStart} XP`);
   setTextSafe("xpNextLevel",     `${nextLevel} XP`);
   setTextSafe("xpRemaining",     `${remaining} XP until next level`);
+}
+
+function renderProfilePage(user, progression, questStats) {
+  if (!user) return;
+
+  const initial = user.username
+    ? user.username.charAt(0).toUpperCase()
+    : "?";
+
+  const totalXp = Number(user.xp ?? progression?.total_xp ?? 0);
+  const level = user.level ?? progression?.level ?? 1;
+  const rank = user.rank ?? progression?.rank ?? "Novice";
+
+  const nextLevel = Number(progression?.next_level_xp ?? 100);
+  const remaining = Number(
+    progression?.xp_to_next_level ?? Math.max(0, nextLevel - totalXp)
+  );
+
+  const percent = calcProgressPercent(totalXp, nextLevel);
+
+  setTextSafe("profilePageAvatar", initial);
+  setTextSafe("profilePageUsername", user.username || "—");
+  setTextSafe("profilePageEmail", user.email || "—");
+  setTextSafe("profilePageRank", rank);
+  setTextSafe("profilePageLevel", `Level ${level}`);
+  setTextSafe("profilePageXP", `${totalXp} XP`);
+  setTextSafe("profilePageXPRemaining", `${remaining} XP until next level`);
+
+  setTextSafe(
+    "profilePageJoined",
+    user.created_at
+      ? new Date(user.created_at).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : "Unavailable"
+  );
+
+  setTextSafe("profileStatXP", String(totalXp));
+  setTextSafe("profileStatLevel", String(level));
+  setTextSafe("profileStatCompleted", String(questStats?.completed ?? 0));
+  setTextSafe("profileStatActive", String(questStats?.in_progress ?? 0));
+
+  const fill = document.getElementById("profilePageXPFill");
+  const bar = document.getElementById("profilePageXPBar");
+
+  if (fill) fill.style.width = `${percent}%`;
+
+  if (bar) {
+    bar.setAttribute("aria-valuenow", String(Math.round(percent)));
+    bar.setAttribute("aria-label", `Level progression: ${Math.round(percent)}%`);
+  }
+
+  const usernameInput = document.getElementById("profileEditUsername");
+  const emailInput = document.getElementById("profileEditEmail");
+
+  if (usernameInput && document.activeElement !== usernameInput) {
+    usernameInput.value = user.username || "";
+  }
+
+  if (emailInput && document.activeElement !== emailInput) {
+    emailInput.value = user.email || "";
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -470,48 +545,6 @@ function statusClass(status) {
   if (status === "In Progress") return "status-inprogress";
   if (status === "Completed")   return "status-completed";
   return "status-available";
-}
-
-/* ═══════════════════════════════════════════════════════
-   RENDER — SKILLS
-═══════════════════════════════════════════════════════ */
-const SKILL_CATEGORIES = [
-  { name: "Python",         icon: "🐍", color: "var(--accent-blue)" },
-  { name: "Java",           icon: "☕", color: "var(--accent-amber)" },
-  { name: "Web Development",icon: "🌐", color: "var(--accent-cyan)" },
-  { name: "DS & Algorithms",icon: "⚡", color: "var(--accent-violet)" },
-  { name: "Database",       icon: "🗄️", color: "var(--accent-green)" },
-];
-
-function renderSkills() {
-  const grid = document.getElementById("skillsGrid");
-  if (!grid) return;
-
-  grid.innerHTML = "";
-  SKILL_CATEGORIES.forEach((skill) => {
-    const card = document.createElement("div");
-    card.className = "skill-card";
-
-    const icon = document.createElement("div");
-    icon.className = "skill-icon";
-    icon.style.background = `${skill.color}22`; // low-opacity tint
-    icon.setAttribute("aria-hidden", "true");
-    // Use textContent; no HTML injection
-    icon.textContent = skill.icon;
-
-    const name = document.createElement("div");
-    name.className = "skill-name";
-    name.textContent = skill.name;
-
-    const status = document.createElement("span");
-    status.className = "skill-status";
-    status.textContent = "Not assessed yet";
-
-    card.appendChild(icon);
-    card.appendChild(name);
-    card.appendChild(status);
-    grid.appendChild(card);
-  });
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -925,6 +958,39 @@ async function refreshProgress() {
   }
 }
 
+async function loadProfilePage() {
+  const status = document.getElementById("profileEditStatus");
+
+  try {
+    const [profile, progress] = await Promise.all([
+      apiGetProfile(CONFIG.DEV_USER_ID),
+      apiGetProgress(CONFIG.DEV_USER_ID),
+    ]);
+
+    STATE.profile = profile;
+    STATE.progression = progress.progression;
+    STATE.questStats = progress.quests;
+
+    renderProfilePage(
+      profile,
+      progress.progression,
+      progress.quests
+    );
+
+    renderHeaderProfile(profile, progress.progression);
+    renderProfileCard(profile, progress.progression);
+    renderStats(profile, progress.progression, progress.quests);
+
+    if (status) status.textContent = "";
+  } catch (error) {
+    if (status) {
+      status.textContent = `Failed to load profile: ${error.message}`;
+    }
+
+    showToast(`Failed to load profile: ${error.message}`, "error", 0);
+  }
+}
+
 /** Replaces skeleton loaders with dashes on profile load error. */
 function renderStatsError() {
   ["statXpValue", "statLevelValue", "statCompletedValue", "statActiveValue"].forEach((id) => {
@@ -1100,6 +1166,10 @@ async function handleWorkspaceReview() {
   const result = document.getElementById("workReviewResult");
 
   const quest = STATE.currentQuest;
+  if (!codeInput || !reviewBtn || !status || !result) {
+      console.error("Elemen Coding Workspace tidak lengkap.");
+      return;
+  }
   const userCode = codeInput.value.trim();
 
   if (!quest) {
@@ -1160,6 +1230,7 @@ async function handleWorkspaceReview() {
 ═══════════════════════════════════════════════════════ */
 const PAGE_META = {
   dashboard: { title: "Dashboard",          subtitle: "Your programming progression overview" },
+  profile:   { title: "My Profile",         subtitle: "Manage your account and view your programming achievements",},
   quests:    { title: "Coding Quests",      subtitle: "Browse, start, and complete coding challenges" },
   work:      { title: "Coding Workspace",   subtitle: "Complete your quest and submit your code for AI review" },
   generator: { title: "AI Quest Generator", subtitle: "Generate personalized programming challenges" },
@@ -1198,12 +1269,17 @@ function navigateTo(pageId) {
   setTextSafe("pageTitle",    meta.title);
   setTextSafe("pageSubtitle", meta.subtitle);
 
-  // Lazy-render skills only when first visiting the page
   if (pageId === "skills") {
-    const grid = document.getElementById("skillsGrid");
-    if (grid && grid.children.length === 0) renderSkills();
+    loadSkillsFromBackend();
   }
 
+  if (pageId === "profile") {
+    loadProfilePage();
+  }
+
+  if (pageId === "progress") {
+    loadProgressPage();
+}
   // Close mobile sidebar
   closeSidebar();
 }
@@ -1224,6 +1300,75 @@ function closeSidebar() {
   if (sidebar)  sidebar.classList.remove("open");
   if (overlay)  overlay.classList.remove("active");
   if (menuBtn)  menuBtn.setAttribute("aria-expanded", "false");
+}
+
+async function handleProfileSave(event) {
+  event.preventDefault();
+
+  const usernameInput = document.getElementById("profileEditUsername");
+  const emailInput = document.getElementById("profileEditEmail");
+  const saveBtn = document.getElementById("profileSaveBtn");
+  const status = document.getElementById("profileEditStatus");
+
+  if (!usernameInput || !emailInput || !saveBtn || !status) return;
+
+  const username = usernameInput.value.trim();
+  const email = emailInput.value.trim();
+
+  if (username.length < 3 || username.length > 50) {
+    status.textContent = "Username must contain 3–50 characters.";
+    return;
+  }
+
+  if (!emailInput.checkValidity()) {
+    status.textContent = "Enter a valid email address.";
+    emailInput.focus();
+    return;
+  }
+
+  const originalText = saveBtn.textContent;
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving...";
+  status.textContent = "Saving profile changes...";
+
+  try {
+    const response = await apiUpdateProfile(
+      CONFIG.DEV_USER_ID,
+      username,
+      email
+    );
+
+    const updatedUser = response.user;
+
+    STATE.profile = {
+      ...STATE.profile,
+      ...updatedUser,
+    };
+
+    renderHeaderProfile(STATE.profile, STATE.progression);
+    renderProfileCard(STATE.profile, STATE.progression);
+
+    renderProfilePage(
+      STATE.profile,
+      STATE.progression,
+      STATE.questStats
+    );
+
+    status.textContent = response.message || "Profile updated successfully.";
+    showToast("Profile updated successfully.", "success");
+  } catch (error) {
+    status.textContent = error.message;
+
+    showToast(
+      `Unable to update profile: ${error.message}`,
+      "error",
+      0
+    );
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = originalText;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1390,6 +1535,27 @@ if (workCompleteBtn) {
       }
     });
   }
+  const profileForm = document.getElementById("profileEditForm");
+
+if (profileForm) {
+  profileForm.addEventListener("submit", handleProfileSave);
+}
+
+const profileCancelBtn = document.getElementById("profileCancelBtn");
+
+if (profileCancelBtn) {
+  profileCancelBtn.addEventListener("click", () => {
+    if (STATE.profile) {
+      renderProfilePage(
+        STATE.profile,
+        STATE.progression,
+        STATE.questStats
+      );
+    }
+
+    setTextSafe("profileEditStatus", "Changes discarded.");
+  });
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1401,6 +1567,10 @@ async function init() {
   // Register all event listeners first so the UI is interactive immediately
   registerEvents();
 
+  initSettings();
+
+  initSkills();
+
   // Set initial page state (dashboard is default)
   navigateTo("dashboard");
 
@@ -1409,3 +1579,422 @@ async function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+
+/* ========================================
+   APPLICATION SETTINGS
+======================================== */
+
+const SETTINGS_KEY = "devmentor_settings";
+
+const DEFAULT_SETTINGS = {
+    theme: "dark",
+    fontSize: 14,
+    language: "Python",
+    notifications: true
+};
+
+function getSettings() {
+    try {
+        const saved = localStorage.getItem(SETTINGS_KEY);
+
+        if (!saved) {
+            return { ...DEFAULT_SETTINGS };
+        }
+
+        const parsed = JSON.parse(saved);
+
+        return {
+            theme: ["dark", "light"].includes(parsed.theme)
+                ? parsed.theme
+                : DEFAULT_SETTINGS.theme,
+
+            fontSize: [12, 14, 16, 18, 20].includes(
+                Number(parsed.fontSize)
+            )
+                ? Number(parsed.fontSize)
+                : DEFAULT_SETTINGS.fontSize,
+
+            language: [
+                "Python",
+                "Java",
+                "JavaScript",
+                "C",
+                "C++",
+                "SQL"
+            ].includes(parsed.language)
+                ? parsed.language
+                : DEFAULT_SETTINGS.language,
+
+            notifications:
+                typeof parsed.notifications === "boolean"
+                    ? parsed.notifications
+                    : DEFAULT_SETTINGS.notifications
+        };
+    } catch (error) {
+        console.error("Gagal membaca pengaturan:", error);
+        return { ...DEFAULT_SETTINGS };
+    }
+}
+
+function saveSettings(settings) {
+    try {
+        localStorage.setItem(
+            SETTINGS_KEY,
+            JSON.stringify(settings)
+        );
+
+        return true;
+    } catch (error) {
+        console.error("Gagal menyimpan pengaturan:", error);
+        return false;
+    }
+}
+
+function applySettings(settings) {
+    // Apply theme to the page.
+    document.body.dataset.theme = settings.theme;
+
+    // Apply editor font size.
+    const editor = document.getElementById("workCodeEditor");
+
+    if (editor) {
+        editor.style.fontSize = `${settings.fontSize}px`;
+    }
+
+    // Update controls if they exist.
+    const themeInput = document.getElementById("settingTheme");
+    const fontInput = document.getElementById("settingFontSize");
+    const languageInput = document.getElementById("settingLanguage");
+    const notificationInput = document.getElementById(
+        "settingNotifications"
+    );
+
+    if (themeInput) themeInput.value = settings.theme;
+    if (fontInput) fontInput.value = String(settings.fontSize);
+    if (languageInput) languageInput.value = settings.language;
+
+    if (notificationInput) {
+        notificationInput.checked = settings.notifications;
+    }
+}
+
+function showSettingsStatus(message, isError = false) {
+    const status = document.getElementById("settingsStatus");
+
+    if (!status) return;
+
+    status.textContent = message;
+    status.style.color = isError ? "#ff7777" : "";
+}
+
+function initSettings() {
+    const themeInput = document.getElementById("settingTheme");
+    const fontInput = document.getElementById("settingFontSize");
+    const languageInput = document.getElementById("settingLanguage");
+    const notificationInput = document.getElementById(
+        "settingNotifications"
+    );
+    const resetButton = document.getElementById("resetSettingsBtn");
+
+    let settings = getSettings();
+
+    applySettings(settings);
+
+    function updateSetting(key, value) {
+        const updatedSettings = {
+            ...settings,
+            [key]: value
+        };
+
+        if (!saveSettings(updatedSettings)) {
+            showSettingsStatus(
+                "Unable to save settings in this browser.",
+                true
+            );
+            return;
+        }
+
+        settings = updatedSettings;
+        applySettings(settings);
+        showSettingsStatus("Settings saved successfully.");
+    }
+
+    if (themeInput) {
+        themeInput.addEventListener("change", () => {
+            updateSetting("theme", themeInput.value);
+        });
+    }
+
+    if (fontInput) {
+        fontInput.addEventListener("change", () => {
+            updateSetting("fontSize", Number(fontInput.value));
+        });
+    }
+
+    if (languageInput) {
+        languageInput.addEventListener("change", () => {
+            updateSetting("language", languageInput.value);
+        });
+    }
+
+    if (notificationInput) {
+        notificationInput.addEventListener("change", () => {
+            updateSetting(
+                "notifications",
+                notificationInput.checked
+            );
+        });
+    }
+
+    if (resetButton) {
+        resetButton.addEventListener("click", () => {
+            const defaults = { ...DEFAULT_SETTINGS };
+
+            if (!saveSettings(defaults)) {
+                showSettingsStatus(
+                    "Unable to reset settings.",
+                    true
+                );
+                return;
+            }
+
+            settings = defaults;
+            applySettings(settings);
+            showSettingsStatus("Settings restored to default.");
+        });
+    }
+}
+
+/* ========================================
+   MY SKILLS FUNCTIONALITY
+======================================== */
+function initSkills() {
+    const searchInput = document.getElementById("skillSearch");
+    const filterSelect = document.getElementById("skillFilter");
+
+    if (searchInput) {
+        searchInput.addEventListener("input", filterSkillCards);
+    }
+
+    if (filterSelect) {
+        filterSelect.addEventListener("change", filterSkillCards);
+    }
+}
+
+function filterSkillCards() {
+    const grid = document.getElementById("skillsGrid");
+    const searchInput = document.getElementById("skillSearch");
+    const filterSelect = document.getElementById("skillFilter");
+
+    if (!grid || !searchInput || !filterSelect) return;
+
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    const filter = filterSelect.value;
+
+    let visibleCount = 0;
+
+    grid.querySelectorAll(".skill-card").forEach((card) => {
+        const name = card.querySelector(".skill-name")
+            ?.textContent.toLowerCase() ?? "";
+
+        const progressText = card.querySelector(".skill-percentage")
+            ?.textContent ?? "0%";
+
+        const progress = Number.parseInt(progressText, 10) || 0;
+
+        const matchesSearch = name.includes(searchTerm);
+        const matchesFilter =
+            filter === "all" ||
+            (filter === "learning" && progress < 100) ||
+            (filter === "mastered" && progress >= 100);
+
+        const visible = matchesSearch && matchesFilter;
+
+        card.hidden = !visible;
+
+        if (visible) visibleCount++;
+    });
+
+    const emptyState = document.getElementById("skillsEmptyState");
+
+    if (emptyState) {
+        emptyState.hidden = visibleCount > 0;
+        emptyState.textContent =
+            searchTerm || filter !== "all"
+                ? "Tidak ada skill yang cocok dengan pencarian atau filter."
+                : "Belum ada skill. Selesaikan quest untuk mulai membangun progres.";
+    }
+}
+  async function loadSkillsFromBackend() {
+    const grid = document.getElementById("skillsGrid");
+
+    if (!grid) return;
+
+    grid.innerHTML = "<p>Memuat progres Skills...</p>";
+
+    try {
+        const data = await apiGetSkills(CONFIG.DEV_USER_ID);
+        const skills = Array.isArray(data.skills) ? data.skills : [];
+
+        grid.innerHTML = "";
+
+        if (skills.length === 0) {
+            setTextSafe("totalSkills", "0");
+            setTextSafe("masteredSkills", "0");
+            setTextSafe("averageSkillProgress", "0%");
+
+            const emptyState = document.getElementById("skillsEmptyState");
+
+            if (emptyState) {
+                emptyState.hidden = false;
+                emptyState.textContent =
+                    "Belum ada skill. Selesaikan quest untuk mulai membangun progres.";
+            }
+
+            return;
+        }
+
+        skills.forEach((skill) => {
+            const progress = Math.min(
+                100,
+                Math.max(0, Number(skill.progress) || 0)
+            );
+
+            const card = document.createElement("article");
+            card.className = "skill-card";
+
+            card.innerHTML = `
+                <div class="skill-card-header">
+                    <h3 class="skill-name"></h3>
+                    <span class="skill-percentage"></span>
+                </div>
+
+                <div class="skill-progress-track">
+                    <div class="skill-progress-fill"></div>
+                </div>
+
+                <p class="skill-detail"></p>
+            `;
+
+            card.querySelector(".skill-name").textContent = skill.name;
+            card.querySelector(".skill-percentage").textContent =
+                `${progress}%`;
+
+            card.querySelector(".skill-progress-fill").style.width =
+                `${progress}%`;
+
+            card.querySelector(".skill-detail").textContent =
+                `${skill.completed_quests} dari ${skill.total_quests} quest selesai`;
+
+            grid.appendChild(card);
+        });
+
+        const total = skills.length;
+
+        const mastered = skills.filter(
+            (skill) => Number(skill.progress) >= 100
+        ).length;
+
+        const average = Math.round(
+            skills.reduce(
+                (sum, skill) => sum + (Number(skill.progress) || 0),
+                0
+            ) / total
+        );
+
+        setTextSafe("totalSkills", String(total));
+        setTextSafe("masteredSkills", String(mastered));
+        setTextSafe("averageSkillProgress", `${average}%`);
+
+        filterSkillCards();
+
+    } catch (error) {
+        console.error("Gagal memuat Skills:", error);
+
+        grid.innerHTML = `
+            <p>Skills gagal dimuat. Periksa koneksi backend.</p>
+        `;
+
+        setTextSafe("totalSkills", "0");
+        setTextSafe("masteredSkills", "0");
+        setTextSafe("averageSkillProgress", "0%");
+    }
+}
+// =========================
+// PROGRESS PAGE
+// =========================
+
+async function loadProgressPage() {
+    const status = document.getElementById("progressPageStatus");
+
+    if (!status) return;
+
+    status.textContent = "Loading progress...";
+
+    try {
+        // Gunakan endpoint progress yang sudah tersedia.
+        const data = await apiGetProgress(CONFIG.DEV_USER_ID);
+
+        const user = data.user;
+        const progression = data.progression;
+        const quests = data.quests;
+
+        if (!user || !progression || !quests) {
+            throw new Error("Incomplete progress data from backend.");
+        }
+
+        // Sinkronkan state aplikasi.
+        STATE.profile = user;
+        STATE.progression = progression;
+        STATE.questStats = quests;
+
+        const totalXP = Number(user.xp ?? progression.total_xp ?? 0);
+        const level = Number(user.level ?? progression.level ?? 1);
+        const rank = user.rank ?? progression.rank ?? "Novice";
+
+        const nextLevelXP = Number(progression.next_level_xp ?? 100);
+        const remainingXP = Number(
+            progression.xp_to_next_level ?? Math.max(0, nextLevelXP - totalXP)
+        );
+
+        const percentage = calcProgressPercent(totalXP, nextLevelXP);
+
+        // Statistik quest berasal dari backend.
+        const completed = Number(quests.completed ?? 0);
+        const active = Number(quests.in_progress ?? 0);
+
+        setTextSafe("progressTotalXP", `${totalXP} XP`);
+        setTextSafe("progressRank", rank);
+        setTextSafe("progressCurrentLevel", `Level ${level}`);
+        setTextSafe("progressNextLevel", `Level ${level + 1}`);
+        setTextSafe(
+            "progressXPRemaining",
+            `${remainingXP} XP until next level`
+        );
+
+        setTextSafe("progressCompletedQuests", String(completed));
+        setTextSafe("progressActiveQuests", String(active));
+
+        setTextSafe("progressLevelDetail", String(level));
+        setTextSafe("progressXPDetail", String(totalXP));
+        setTextSafe("progressRankDetail", rank);
+
+        const fill = document.getElementById("progressXPFill");
+
+        if (fill) {
+            fill.style.width = `${percentage}%`;
+        }
+
+        // Perbarui komponen aplikasi lainnya.
+        renderHeaderProfile(user, progression);
+        renderProfileCard(user, progression);
+        renderStats(user, progression, quests);
+
+        status.textContent = "Progress loaded successfully.";
+    } catch (error) {
+        console.error("Failed to load progress:", error);
+
+        status.textContent = `Unable to load progress: ${error.message}`;
+    }
+}

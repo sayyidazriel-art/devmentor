@@ -81,6 +81,32 @@
             <span>Skill Development</span>
           </button>
         </li>
+        <li>
+          <button class="nav-item" data-page="profile">
+            <svg
+              class="nav-icon"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <circle
+                cx="10"
+                cy="6"
+                r="3"
+                stroke="currentColor"
+                stroke-width="1.5"
+              />
+              <path
+                d="M4 17c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span>My Profile</span>
+          </button>
+        </li>
         <li class="nav-divider" role="separator"></li>
         <li>
           <button class="nav-item" data-page="settings">
@@ -277,6 +303,160 @@
             <div id="recentQuestsList" class="recent-quests-list">
               <p class="card-loading">Loading quests…</p>
             </div>
+          </section>
+
+        </div>
+      </section>
+      
+      <!-- MY PROFILE PAGE -->
+      <section
+        class="page"
+        id="page-profile"
+        aria-labelledby="profilePageHeading"
+        hidden
+      >
+        <div class="profile-page-grid">
+
+          <!-- PROFILE SUMMARY -->
+          <section class="card profile-overview-card">
+            <header class="card-header">
+              <h2 class="card-title" id="profilePageHeading">
+                My Profile
+              </h2>
+            </header>
+
+            <div class="profile-overview-body">
+              <div
+                class="profile-page-avatar"
+                id="profilePageAvatar"
+                aria-hidden="true"
+              >?</div>
+
+              <h3 id="profilePageUsername">Loading...</h3>
+              <p id="profilePageEmail" class="profile-page-email">—</p>
+
+              <div class="profile-badges">
+                <span class="badge badge-rank" id="profilePageRank">—</span>
+                <span class="badge badge-level" id="profilePageLevel">Level —</span>
+              </div>
+
+              <div class="profile-page-xp">
+                <div class="xp-labels">
+                  <span class="xp-label-text">Total Experience</span>
+                  <span id="profilePageXP">0 XP</span>
+                </div>
+
+                <div
+                  class="progress-bar-track"
+                  role="progressbar"
+                  id="profilePageXPBar"
+                  aria-label="Level progression"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-valuenow="0"
+                >
+                  <div
+                    class="progress-bar-fill"
+                    id="profilePageXPFill"
+                    style="width: 0%"
+                  ></div>
+                </div>
+
+                <p id="profilePageXPRemaining" class="xp-remaining">
+                  Loading progression...
+                </p>
+              </div>
+
+              <p class="profile-joined">
+                Member since <span id="profilePageJoined">—</span>
+              </p>
+            </div>
+          </section>
+
+          <!-- QUEST STATISTICS -->
+          <section class="card profile-statistics-card">
+            <header class="card-header">
+              <h2 class="card-title">Your Statistics</h2>
+            </header>
+
+            <div class="profile-statistics-grid">
+              <div class="profile-stat-item">
+                <span class="profile-stat-label">Total XP</span>
+                <strong id="profileStatXP">0</strong>
+              </div>
+
+              <div class="profile-stat-item">
+                <span class="profile-stat-label">Current Level</span>
+                <strong id="profileStatLevel">1</strong>
+              </div>
+
+              <div class="profile-stat-item">
+                <span class="profile-stat-label">Completed Quests</span>
+                <strong id="profileStatCompleted">0</strong>
+              </div>
+
+              <div class="profile-stat-item">
+                <span class="profile-stat-label">Active Quests</span>
+                <strong id="profileStatActive">0</strong>
+              </div>
+            </div>
+          </section>
+
+          <!-- EDIT PROFILE -->
+          <section class="card profile-edit-card">
+            <header class="card-header">
+              <h2 class="card-title">Account Information</h2>
+            </header>
+
+            <form id="profileEditForm" class="profile-edit-form">
+              <label for="profileEditUsername" class="form-label">
+                Username
+              </label>
+              <input
+                type="text"
+                class="form-select"
+                id="profileEditUsername"
+                minlength="3"
+                maxlength="50"
+                required
+              />
+
+              <label for="profileEditEmail" class="form-label">
+                Email Address
+              </label>
+              <input
+                type="email"
+                class="form-select"
+                id="profileEditEmail"
+                maxlength="255"
+                required
+              />
+
+              <div class="profile-edit-actions">
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  id="profileSaveBtn"
+                >
+                  Save Changes
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="profileCancelBtn"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <p
+                id="profileEditStatus"
+                class="coming-soon-note"
+                role="status"
+                aria-live="polite"
+              ></p>
+            </form>
           </section>
 
         </div>
@@ -498,36 +678,240 @@
 
       <!-- ── MY PROGRESS PAGE ── -->
       <section class="page" id="page-progress" aria-labelledby="pageTitle" hidden>
-        <div class="placeholder-page">
-          <svg class="placeholder-icon-lg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="4" y="4" width="56" height="56" rx="8" stroke="var(--border-subtle)" stroke-width="2"/>
-            <path d="M12 44l10-12 8 8 10-14 12 8" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
-          </svg>
-          <h2 class="placeholder-heading">My Progress — Under Development</h2>
-          <p class="placeholder-desc">Detailed progression charts, XP history, level milestones, and skill timelines will be available in a future update.</p>
+        <div class="progress-page">
+            <div class="page-header">
+                <div>
+                    <h1>Learning Progress</h1>
+                    <p>Track your coding journey and achievements.</p>
+                </div>
+            </div>
+
+            <!-- Overview -->
+            <div class="progress-overview">
+                <div class="progress-card progress-main-card">
+                    <span class="progress-label">TOTAL EXPERIENCE</span>
+                    <h2 id="progressTotalXP">0 XP</h2>
+                    <p id="progressRank">Novice</p>
+
+                    <div class="progress-level-info">
+                        <span id="progressCurrentLevel">Level 1</span>
+                        <span id="progressNextLevel">Next Level</span>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div id="progressXPFill" class="progress-fill"></div>
+                    </div>
+
+                    <small id="progressXPRemaining">Keep learning to earn XP.</small>
+                </div>
+
+                <div class="progress-card">
+                    <span class="progress-label">COMPLETED QUESTS</span>
+                    <h2 id="progressCompletedQuests">0</h2>
+                    <p>Quests completed</p>
+                </div>
+
+                <div class="progress-card">
+                    <span class="progress-label">ACTIVE QUESTS</span>
+                    <h2 id="progressActiveQuests">0</h2>
+                    <p>Quests in progress</p>
+                </div>
+            </div>
+
+            <!-- Level Progress -->
+            <div class="progress-card progress-level-card">
+                <h3>Level Progression</h3>
+                <p>Your current experience and level progression.</p>
+
+                <div class="level-progress-details">
+                    <div>
+                        <span>Current Level</span>
+                        <strong id="progressLevelDetail">1</strong>
+                    </div>
+
+                    <div>
+                        <span>Total XP</span>
+                        <strong id="progressXPDetail">0</strong>
+                    </div>
+
+                    <div>
+                        <span>Rank</span>
+                        <strong id="progressRankDetail">Novice</strong>
+                    </div>
+                </div>
+            </div>
+
+            <p id="progressPageStatus" class="progress-status"></p>
         </div>
       </section>
 
       <!-- ── SKILL DEVELOPMENT PAGE ── -->
       <section class="page" id="page-skills" aria-labelledby="pageTitle" hidden>
-        <div class="skills-intro">
-          <p>Skill assessments are not yet available. Categories below show your current status based on backend data.</p>
-        </div>
-        <div class="skills-grid" id="skillsGrid">
-          <!-- Rendered by JS -->
-        </div>
+        <div class="skills-page">
+          <div class="skills-page-header">
+              <div>
+                  <h2>My Skills</h2>
+                  <p>Track your programming skills and learning progress.</p>
+              </div>
+
+          </div>
+
+          <div class="skills-summary-grid">
+              <article class="skills-summary-card">
+                  <span>Total Skills</span>
+                  <strong id="totalSkills">0</strong>
+              </article>
+
+              <article class="skills-summary-card">
+                  <span>Mastered Skills</span>
+                  <strong id="masteredSkills">0</strong>
+              </article>
+
+              <article class="skills-summary-card">
+                  <span>Average Progress</span>
+                  <strong id="averageSkillProgress">0%</strong>
+              </article>
+          </div>
+
+          <div class="skills-toolbar">
+              <input
+                  type="search"
+                  id="skillSearch"
+                  placeholder="Search programming skills..."
+                  aria-label="Search skills"
+              >
+
+              <select id="skillFilter" aria-label="Filter skills">
+                  <option value="all">All Skills</option>
+                  <option value="learning">In Progress</option>
+                  <option value="mastered">Mastered</option>
+              </select>
+          </div>
+
+          <div id="skillsGrid" class="skills-grid"></div>
+
+          <p id="skillsEmptyState" class="skills-empty-state" hidden>
+              No skills found. Add a skill to start tracking your progress.
+          </p>
+
+          <p id="skillsStatus" role="status" aria-live="polite"></p>
+
+          </div>
       </section>
 
       <!-- ── SETTINGS PAGE ── -->
       <section class="page" id="page-settings" aria-labelledby="pageTitle" hidden>
-        <div class="placeholder-page">
-          <svg class="placeholder-icon-lg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="32" cy="32" r="28" stroke="var(--border-subtle)" stroke-width="2"/>
-            <circle cx="32" cy="32" r="10" stroke="var(--accent-blue)" stroke-width="2" opacity="0.5"/>
-            <path d="M32 4v8M32 52v8M4 32h8M52 32h8" stroke="var(--border-subtle)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <h2 class="placeholder-heading">Settings — Under Development</h2>
-          <p class="placeholder-desc">Theme preferences, notification settings, and account management will be available here in a future update.</p>
+        <div class="settings-page">
+          <div class="settings-heading">
+              <h2>Application Settings</h2>
+              <p>Customize your DevMentor learning environment.</p>
+          </div>
+
+          <!-- Appearance -->
+          <div class="settings-card">
+              <div class="settings-card-heading">
+                  <div>
+                      <h3>Appearance</h3>
+                      <p>Customize the look of your workspace.</p>
+                  </div>
+                  <span class="settings-icon">◐</span>
+              </div>
+
+              <div class="settings-row">
+                  <div class="settings-info">
+                      <label for="settingTheme">Color Theme</label>
+                      <p>Choose your preferred interface theme.</p>
+                  </div>
+
+                  <select id="settingTheme" class="settings-control">
+                      <option value="dark">Dark</option>
+                      <option value="light">Light</option>
+                  </select>
+              </div>
+          </div>
+
+          <!-- Coding Workspace -->
+          <div class="settings-card">
+              <div class="settings-card-heading">
+                  <div>
+                      <h3>Coding Workspace</h3>
+                      <p>Adjust your coding environment.</p>
+                  </div>
+                  <span class="settings-icon">&lt;/&gt;</span>
+              </div>
+
+              <div class="settings-row">
+                  <div class="settings-info">
+                      <label for="settingFontSize">Editor Font Size</label>
+                      <p>Change the text size in the code editor.</p>
+                  </div>
+
+                  <select id="settingFontSize" class="settings-control">
+                      <option value="12">12 px</option>
+                      <option value="14">14 px</option>
+                      <option value="16">16 px</option>
+                      <option value="18">18 px</option>
+                      <option value="20">20 px</option>
+                  </select>
+              </div>
+
+              <div class="settings-row">
+                  <div class="settings-info">
+                      <label for="settingLanguage">Preferred Language</label>
+                      <p>Choose your current learning focus.</p>
+                  </div>
+
+                  <select id="settingLanguage" class="settings-control">
+                      <option value="Python">Python</option>
+                      <option value="Java">Java</option>
+                      <option value="JavaScript">JavaScript</option>
+                      <option value="C">C</option>
+                      <option value="C++">C++</option>
+                      <option value="SQL">SQL</option>
+                  </select>
+              </div>
+          </div>
+
+          <!-- Notifications -->
+          <div class="settings-card">
+              <div class="settings-card-heading">
+                  <div>
+                      <h3>Notifications</h3>
+                      <p>Manage your learning reminders.</p>
+                  </div>
+                  <span class="settings-icon">♧</span>
+              </div>
+
+              <div class="settings-row">
+                  <div class="settings-info">
+                      <label for="settingNotifications">Learning Reminders</label>
+                      <p>Enable or disable learning reminder preferences.</p>
+                  </div>
+
+                  <label class="settings-switch">
+                      <input
+                          type="checkbox"
+                          id="settingNotifications"
+                      >
+                      <span class="settings-switch-slider"></span>
+                  </label>
+              </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="settings-actions">
+              <p id="settingsStatus" role="status" aria-live="polite">
+                  Your preferences are saved automatically.
+              </p>
+
+              <button
+                  type="button"
+                  id="resetSettingsBtn"
+                  class="settings-reset-btn"
+              >
+                  Reset to Default
+              </button>
+          </div>
         </div>
       </section>
 
