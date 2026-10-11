@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="DevMentor — AI Compass and Personal Coach for Junior Programmers" />
+  <title>DevMentor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       MOBILE OVERLAY (closes nav drawer)
+  ═══════════════════════════════════════════════ -->
+  <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       LEFT SIDEBAR
+  ═══════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <div class="sidebar-header">
+      <div class="logo-mark" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="14,2 26,8 26,20 14,26 2,20 2,8" fill="none" stroke="var(--accent-blue)" stroke-width="1.5"/>
+          <polygon points="14,7 21,11 21,19 14,23 7,19 7,11" fill="none" stroke="var(--accent-cyan)" stroke-width="1"/>
+          <circle cx="14" cy="14" r="3" fill="var(--accent-blue)"/>
+        </svg>
+      </div>
+      <span class="logo-wordmark">DevMentor</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <ul role="list">
+        <li>
+          <button class="nav-item active" data-page="dashboard" aria-current="page">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="2" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="11" y="2" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="2" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+              <rect x="11" y="11" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            <span>Dashboard</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item" data-page="generator">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none"
+                xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 2l2.2 5.8L18 10l-5.8 2.2L10 18l-2.2-5.8L2 10l5.8-2.2L10 2z"
+                    stroke="currentColor" stroke-width="1.5"
+                    stroke-linejoin="round"/>
+            </svg>
+            <span>AI Quest Generator</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item" data-page="quests">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M4 6h12M4 10h8M4 14h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="16" cy="14" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M15 14l.8.8 1.4-1.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+            <span>Coding Quests</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item" data-page="progress">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M3 15l4-4 3 3 4-5 3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 17h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>My Progress</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item" data-page="skills">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.22 4.22l1.42 1.42M14.36 14.36l1.42 1.42M4.22 15.78l1.42-1.42M14.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>Skill Development</span>
+          </button>
+        </li>
+        <li class="nav-divider" role="separator"></li>
+        <li>
+          <button class="nav-item" data-page="settings">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 2.5c.3 0 .6.15.8.4l.9 1.2c.2.25.55.35.85.25l1.4-.45c.55-.2 1.1.15 1.2.7l.25 1.5c.05.3.25.55.55.65l1.45.5c.55.15.75.8.45 1.25l-.85 1.2a.9.9 0 000 1.05l.85 1.2c.3.45.1 1.1-.45 1.25l-1.45.5c-.3.1-.5.35-.55.65l-.25 1.5c-.1.55-.65.9-1.2.7l-1.4-.45a.9.9 0 00-.85.25l-.9 1.2a.9.9 0 01-1.6 0l-.9-1.2a.9.9 0 00-.85-.25l-1.4.45c-.55.2-1.1-.15-1.2-.7l-.25-1.5a.9.9 0 00-.55-.65l-1.45-.5c-.55-.15-.75-.8-.45-1.25l.85-1.2a.9.9 0 000-1.05l-.85-1.2c-.3-.45-.1-1.1.45-1.25l1.45-.5c.3-.1.5-.35.55-.65l.25-1.5c.1-.55.65-.9 1.2-.7l1.4.45a.9.9 0 00.85-.25l.9-1.2c.2-.25.5-.4.8-.4z" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            <span>Settings</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-version">v0.1.0 · MVP</span>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN WRAPPER
+  ═══════════════════════════════════════════════ -->
+  <div class="main-wrapper">
+
+    <!-- TOP HEADER -->
+    <header class="top-header" role="banner">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="header-title-group">
+          <h1 class="header-title" id="pageTitle">Dashboard</h1>
+          <p class="header-subtitle" id="pageSubtitle">Your programming progression overview</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="header-search" role="search">
+          <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="8.5" cy="8.5" r="5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <input type="search" id="headerSearch" placeholder="Search quests…" aria-label="Search quests" />
+        </div>
+
+        <button class="icon-btn" id="notificationBtn" aria-label="Notifications (none)">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M10 2a6 6 0 00-6 6v3l-1.5 2.5h15L16 11V8a6 6 0 00-6-6z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8.5 16.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+
+        <div class="profile-dropdown-wrapper">
+          <button class="user-profile-btn" id="userProfileBtn" aria-haspopup="true" aria-expanded="false" aria-label="User profile menu">
+            <div class="avatar" aria-hidden="true" id="userAvatar">?</div>
+            <div class="user-info">
+              <span class="user-name" id="headerUsername">Loading…</span>
+              <span class="user-rank" id="headerRank">—</span>
+            </div>
+            <svg class="chevron-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="profile-dropdown" id="profileDropdown" role="menu" aria-label="Profile options" hidden>
+            <div class="dropdown-user-detail">
+              <span id="dropdownUsername">—</span>
+              <span id="dropdownEmail" class="dropdown-email">—</span>
+            </div>
+            <hr class="dropdown-divider" />
+            <button class="dropdown-item" role="menuitem" id="refreshDataBtn">
+              <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M13 8A5 5 0 103 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M13 5v3h-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Refresh Data
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════
+         PAGE CONTENT AREA
+    ═══════════════════════════════════════════════ -->
+    <main class="content-area" id="contentArea" role="main">
+
+      <!-- Global toast / alert -->
+      <div
+        class="toast-region"
+        id="toastRegion"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></div>
+
+      <!-- ── DASHBOARD PAGE ── -->
+      <section class="page active" id="page-dashboard" aria-labelledby="pageTitle">
+        <!-- Stats row -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card" id="statXP">
+            <div class="stat-icon accent-blue" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="10,2 12.4,7.6 18.5,8 14,12.1 15.5,18 10,15 4.5,18 6,12.1 1.5,8 7.6,7.6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Total XP</span>
+              <span class="stat-value" id="statXpValue"><span class="skeleton-text"></span></span>
+            </div>
+          </div>
+
+          <div class="stat-card" id="statLevel">
+            <div class="stat-icon accent-violet" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 3L3 17h14L10 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M10 10v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="10" cy="8" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Current Level</span>
+              <span class="stat-value" id="statLevelValue"><span class="skeleton-text"></span></span>
+            </div>
+          </div>
+
+          <div class="stat-card" id="statCompleted">
+            <div class="stat-icon accent-green" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Completed Quests</span>
+              <span class="stat-value" id="statCompletedValue"><span class="skeleton-text"></span></span>
+            </div>
+          </div>
+
+          <div class="stat-card" id="statActive">
+            <div class="stat-icon accent-amber" aria-hidden="true">
+              <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M10 6v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="stat-body">
+              <span class="stat-label">Active Quests</span>
+              <span class="stat-value" id="statActiveValue"><span class="skeleton-text"></span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player profile card + Quest board row -->
+        <div class="dashboard-grid">
+
+          <!-- Player profile card -->
+          <section class="card profile-card" aria-labelledby="profileHeading">
+            <header class="card-header">
+              <h2 class="card-title" id="profileHeading">Player Profile</h2>
+            </header>
+            <div class="profile-body" id="profileBody">
+              <div class="profile-avatar-large" id="profileAvatarLarge" aria-hidden="true">?</div>
+              <div class="profile-details">
+                <p class="profile-username" id="profileUsername"><span class="skeleton-text wide"></span></p>
+                <div class="profile-badges">
+                  <span class="badge badge-rank" id="profileRank"><span class="skeleton-text narrow"></span></span>
+                  <span class="badge badge-level" id="profileLevel"><span class="skeleton-text narrow"></span></span>
+                </div>
+                <div class="xp-section">
+                  <div class="xp-labels">
+                    <span class="xp-label-text">XP Progress</span>
+                    <span class="xp-label-value" id="xpLabelValue">—</span>
+                  </div>
+                  <div class="progress-bar-track" role="progressbar" aria-label="XP progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="xpProgressBar">
+                    <div class="progress-bar-fill" id="xpProgressFill" style="width:0%"></div>
+                  </div>
+                  <div class="xp-sub-labels">
+                    <span id="xpCurrentLevel">—</span>
+                    <span id="xpNextLevel">—</span>
+                  </div>
+                </div>
+                <p class="xp-remaining" id="xpRemaining">Loading progression…</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Recent / featured quests mini-panel -->
+          <section class="card recent-quests-card" aria-labelledby="recentQuestsHeading">
+            <header class="card-header">
+              <h2 class="card-title" id="recentQuestsHeading">Active Quests</h2>
+              <button class="card-link-btn" data-page="quests">View all →</button>
+            </header>
+            <div id="recentQuestsList" class="recent-quests-list">
+              <p class="card-loading">Loading quests…</p>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <!-- ── CODING QUESTS PAGE ── -->
+      <section class="page" id="page-quests" aria-labelledby="pageTitle" hidden>
+        <div class="quest-controls" role="toolbar" aria-label="Quest filters">
+          <div class="quest-search-wrap" role="search">
+            <svg class="search-icon" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="8.5" cy="8.5" r="5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M13 13l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input type="search" id="questSearch" placeholder="Search quests by title or description…" aria-label="Search quests" />
+          </div>
+          <div class="filter-pills" role="group" aria-label="Filter quests by status or difficulty">
+            <button class="filter-pill active" data-filter="all">All</button>
+            <button class="filter-pill" data-filter="easy">Easy</button>
+            <button class="filter-pill" data-filter="medium">Medium</button>
+            <button class="filter-pill" data-filter="hard">Hard</button>
+            <button class="filter-pill" data-filter="in-progress">In Progress</button>
+            <button class="filter-pill" data-filter="completed">Completed</button>
+          </div>
+        </div>
+
+        <div id="questBoard" class="quest-board">
+          <p class="card-loading">Loading quests…</p>
+        </div>
+      </section>
+            <!-- ── AI QUEST GENERATOR PAGE ── -->
+      <section class="page" id="page-generator" aria-labelledby="generatorHeading" hidden>
+
+        <div class="review-layout">
+
+          <!-- Generator Form -->
+          <div class="card review-card">
+            <header class="card-header">
+              <h2 class="card-title" id="generatorHeading">
+                Generate Your Coding Quest
+              </h2>
+            </header>
+
+            <div class="review-form-body">
+
+              <p class="placeholder-desc">
+                Create a personalized programming challenge with AI.
+                Choose your programming language, difficulty, and topic.
+              </p>
+
+              <label for="generatorLanguage" class="form-label">
+                Programming Language
+              </label>
+
+              <select id="generatorLanguage" class="form-select">
+                <option value="Python">Python</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Java">Java</option>
+                <option value="C++">C++</option>
+                <option value="SQL">SQL</option>
+              </select>
+
+              <label for="generatorDifficulty" class="form-label">
+                Difficulty
+              </label>
+
+              <select id="generatorDifficulty" class="form-select">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+
+              <label for="generatorTopic" class="form-label">
+                Quest Topic
+              </label>
+
+              <input
+                type="text"
+                id="generatorTopic"
+                class="form-select"
+                placeholder="Example: Sorting, Arrays, OOP..."
+                maxlength="200"
+              />
+
+              <button
+                type="button"
+                class="btn btn-primary"
+                id="generateQuestBtn"
+              >
+                Generate Quest
+              </button>
+
+              <p
+                id="generatorStatus"
+                class="coming-soon-note"
+                role="status"
+                aria-live="polite"
+              >
+                Configure your quest and click Generate Quest.
+              </p>
+
+            </div>
+          </div>
+
+          <!-- Generated Quest Result -->
+          <div class="card review-results-card">
+            <header class="card-header">
+              <h2 class="card-title">Generated Quest</h2>
+            </header>
+
+            <div
+              id="generatedQuestResult"
+              class="review-results-placeholder"
+              aria-live="polite"
+            >
+              <p class="placeholder-title">
+                Your Next Challenge
+              </p>
+
+              <p id="generatedQuestText" class="placeholder-text">
+                Your AI-generated quest will appear here.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ── CODING WORKSPACE PAGE ── -->
+      <section class="page" id="page-work" aria-labelledby="workHeading" hidden>
+
+        <div class="card work-card">
+          <header class="card-header">
+            <button type="button" class="btn btn-secondary" id="backToQuestsBtn">
+              ← Back to Quests
+            </button>
+            <span class="badge badge-level" id="workQuestDifficulty">Difficulty</span>
+          </header>
+
+          <div class="work-content">
+            <h2 class="card-title" id="workHeading">Quest Workspace</h2>
+            <p id="workQuestDescription" class="placeholder-desc">
+              Quest description will appear here.
+            </p>
+
+            <div class="work-info-grid">
+              <div class="work-info-item">
+                <span class="form-label">Programming Language</span>
+                <p id="workQuestLanguage">—</p>
+              </div>
+
+              <div class="work-info-item">
+                <span class="form-label">Reward</span>
+                <p id="workQuestXP">— XP</p>
+              </div>
+            </div>
+
+            <div class="work-instructions">
+              <h3>Requirements</h3>
+              <div id="workQuestRequirements" class="work-text">
+                Quest requirements will appear here.
+              </div>
+            </div>
+
+            <div class="work-instructions">
+              <h3>Acceptance Criteria</h3>
+              <div id="workQuestCriteria" class="work-text">
+                Quest completion criteria will appear here.
+              </div>
+            </div>
+
+            <div class="work-editor">
+              <label for="workCodeEditor" class="form-label">
+                Your Code
+              </label>
+
+              <textarea
+                id="workCodeEditor"
+                class="code-textarea"
+                placeholder="# Write your solution here..."
+                rows="18"
+                spellcheck="false"
+                aria-label="Write your quest solution"
+              ></textarea>
+
+              <div class="work-actions">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  id="workReviewBtn"
+                >
+                  Review Code
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  id="workCompleteBtn"
+                >
+                  Complete Quest
+                </button>
+              </div>
+
+              <p id="workStatus" class="coming-soon-note" role="status" aria-live="polite">
+                Write your solution before submitting it for AI review.
+              </p>
+            </div>
+
+            <div class="work-review-results">
+              <h3>AI Review Results</h3>
+              <div id="workReviewResult" class="work-text" aria-live="polite">
+                Your review feedback will appear here.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── MY PROGRESS PAGE ── -->
+      <section class="page" id="page-progress" aria-labelledby="pageTitle" hidden>
+        <div class="placeholder-page">
+          <svg class="placeholder-icon-lg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="4" y="4" width="56" height="56" rx="8" stroke="var(--border-subtle)" stroke-width="2"/>
+            <path d="M12 44l10-12 8 8 10-14 12 8" stroke="var(--accent-blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+          </svg>
+          <h2 class="placeholder-heading">My Progress — Under Development</h2>
+          <p class="placeholder-desc">Detailed progression charts, XP history, level milestones, and skill timelines will be available in a future update.</p>
+        </div>
+      </section>
+
+      <!-- ── SKILL DEVELOPMENT PAGE ── -->
+      <section class="page" id="page-skills" aria-labelledby="pageTitle" hidden>
+        <div class="skills-intro">
+          <p>Skill assessments are not yet available. Categories below show your current status based on backend data.</p>
+        </div>
+        <div class="skills-grid" id="skillsGrid">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+      <!-- ── SETTINGS PAGE ── -->
+      <section class="page" id="page-settings" aria-labelledby="pageTitle" hidden>
+        <div class="placeholder-page">
+          <svg class="placeholder-icon-lg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="32" cy="32" r="28" stroke="var(--border-subtle)" stroke-width="2"/>
+            <circle cx="32" cy="32" r="10" stroke="var(--accent-blue)" stroke-width="2" opacity="0.5"/>
+            <path d="M32 4v8M32 52v8M4 32h8M52 32h8" stroke="var(--border-subtle)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <h2 class="placeholder-heading">Settings — Under Development</h2>
+          <p class="placeholder-desc">Theme preferences, notification settings, and account management will be available here in a future update.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
